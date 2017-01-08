@@ -1,0 +1,2 @@
+chmod 644 iot_message/tests/*.py
+python3 -m nose --with-specplugin
