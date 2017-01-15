@@ -17,7 +17,7 @@ setup(
     description='Custom iot:1 protocol',
     keywords=['iot:1'],
     long_description=(read('readme.md')),
-    url='https://bitbucket.org/kosci/charlcd.git',
+    url='https://github.com/bkosciow/python_iot-1',
     license='MIT',
     author='Bartosz Kościów',
     author_email='kosci1@gmail.com',

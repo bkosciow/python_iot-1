@@ -10,7 +10,7 @@ Messages are json strings.
         "protocol": "iot:1",
         "node": "Rpi-lcd-1",
         "chip_id": "RpiB",
-        "event": "display",
+        "event": "lcd.content",
         "parameters: [
             "content": "-(=^.^)"
         ],
