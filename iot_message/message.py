@@ -1,38 +1,25 @@
 #!/usr/bin/python3
 import os
 import subprocess
-import iot_message.abstract.message_interface as message_interface
 import json
 
 __author__ = 'Bartosz Kościów'
 
 
-class Message(message_interface.Message):
+class Message(object):
     """Class Message"""
     protocol = "iot:1"
+    chip_id = None
+    node_name = None
 
-    def __init__(self, node, chip_id=None):
-        self._node = node
-        if chip_id is None:
-            self._chip_id = self._get_id()
-        else:
-            self._chip_id = chip_id
+    def __init__(self):
+        if self.chip_id is None:
+            self.chip_id = self._get_id()
 
-    @property
-    def node(self):
-        """
-        Return node name
-        :return string
-        """
-        return self._node
+        if self.node_name is None:
+            self.node_name = self._get_node_name()
 
-    @property
-    def chip_id(self):
-        """
-        Return chip id
-        :return string
-        """
-        return self._chip_id
+        self.data = None
 
     def _get_id(self):
         """:return string"""
@@ -41,15 +28,15 @@ class Message(message_interface.Message):
         else:
             return subprocess.getoutput('cat /var/lib/dbus/machine-id')
 
-    def prepare_message(self, data=None):
-        """
-        Return message as dict
-        :return dict
-        """
-        message = {
+    def _get_node_name(self):
+        import socket
+        return socket.gethostname()
+
+    def _initialize_data(self):
+        self.data = {
             'protocol': self.protocol,
-            'node': self._node,
-            'chip_id': self._chip_id,
+            'node': self.node_name,
+            'chip_id': self.chip_id,
             'event': '',
             'parameters': {},
             'response': '',
@@ -57,37 +44,16 @@ class Message(message_interface.Message):
                 'ALL'
             ]
         }
-        if type(data) is dict:
-            for k, v in data.items():
-                if k in message:
-                    message[k] = v
 
-        return message
+    def set(self, data):
+        if self.data is None:
+            self._initialize_data()
 
-    def decode_message(self, message):
-        """
-        Decode json string to dict. Validate against node name(targets) and protocol version
-        :return dict | None
-        """
-        try:
-            message = json.loads(message)
-            if not self._validate_message(message):
-                message = None
-        except ValueError:
-            message = None
+        for k, v in data.items():
+            self.data[k] = v
 
-        return message
+    def __bytes__(self):
+        return json.dumps(self.data).encode()
 
-    def _validate_message(self, message):
-        """:return boolean"""
-        if 'protocol' not in message or 'targets' not in message or \
-                type(message['targets']) is not list:
-            return False
-
-        if message['protocol'] != self.protocol:
-            return False
-
-        if self.node not in message['targets'] and 'ALL' not in message['targets']:
-            return False
-
-        return True
+    def __repr__(self):
+        return json.dumps(self.data)
