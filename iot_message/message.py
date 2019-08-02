@@ -20,6 +20,11 @@ class Message(object):
             self.node_name = self._get_node_name()
 
         self.data = None
+        self.encoder = None
+        self.decoders = {}
+
+    def add_decoder(self, decoder):
+        self.decoders[decoder.name] = decoder
 
     def _get_id(self):
         """:return string"""
@@ -51,6 +56,10 @@ class Message(object):
 
         for k, v in data.items():
             self.data[k] = v
+
+    def encrypt(self):
+        if self.encoder is not None:
+            self.encoder.encrypt(self)
 
     def __bytes__(self):
         return json.dumps(self.data).encode()
