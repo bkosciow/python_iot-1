@@ -10,7 +10,7 @@ class Cryptor(CryptorInterface):
         msg = json.dumps(message.data)
         encoded_msg = base64.b64encode(msg.encode())
         message.set({
-            'event': 'message.base64',
+            'event': self.name,
             'parameters': [encoded_msg.decode()],
             'response': ''
         })

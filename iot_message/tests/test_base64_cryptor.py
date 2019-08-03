@@ -34,7 +34,7 @@ class TestCryptorBase64(object):
         Message.node_name = 'Turkusik'
         inp = """{"protocol": "iot:1", "node": "Turkusik", "chip_id": "pc", "event": "message.base64", "parameters": ["eyJwcm90b2NvbCI6ICJpb3Q6MSIsICJub2RlIjogIlR1cmt1c2lrIiwgImNoaXBfaWQiOiAicGMiLCAiZXZlbnQiOiAiY2hhbm5lbC5vbiIsICJwYXJhbWV0ZXJzIjogeyJjaGFubmVsIjogMH0sICJyZXNwb25zZSI6ICIiLCAidGFyZ2V0cyI6IFsiVHVya3VzaWsiXX0="], "response": "", "targets": ["Turkusik"]}"""
         msg = factory.MessageFactory.create(inp)
-
+        msg.add_decoder(B64())
         assert_equal(msg.data["event"], "channel.on")
         assert_equal(msg.data["parameters"], {"channel": 0})
         assert_equal(msg.data["target"], ['Turkusik'])
