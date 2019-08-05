@@ -12,6 +12,8 @@ class Message(object):
     protocol = "iot:1"
     chip_id = None
     node_name = None
+    encoder = None
+    decoders = {}
 
     def __init__(self):
         if self.chip_id is None:
@@ -21,11 +23,10 @@ class Message(object):
             self.node_name = self._get_node_name()
 
         self.data = None
-        self.encoder = None
-        self.decoders = {}
 
-    def add_decoder(self, decoder):
-        self.decoders[decoder.name] = decoder
+    @classmethod
+    def add_decoder(cls, decoder):
+        cls.decoders[decoder.name] = decoder
 
     def _get_id(self):
         """:return string"""

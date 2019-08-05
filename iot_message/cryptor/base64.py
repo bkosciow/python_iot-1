@@ -16,4 +16,7 @@ class Cryptor(CryptorInterface):
         })
 
     def decrypt(self, message):
-        pass
+        msg = message.data['parameters'][0]
+        msg = base64.b64decode(msg)
+        msg = json.loads(msg)
+        message.set(msg)
