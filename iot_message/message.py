@@ -2,6 +2,7 @@
 import os
 import subprocess
 import json
+from iot_message.exception import DecryptNotFound
 
 __author__ = 'Bartosz Kościów'
 
@@ -11,6 +12,8 @@ class Message(object):
     protocol = "iot:1"
     chip_id = None
     node_name = None
+    encoder = None
+    decoders = {}
 
     def __init__(self):
         if self.chip_id is None:
@@ -20,11 +23,10 @@ class Message(object):
             self.node_name = self._get_node_name()
 
         self.data = None
-        self.encoder = None
-        self.decoders = {}
 
-    def add_decoder(self, decoder):
-        self.decoders[decoder.name] = decoder
+    @classmethod
+    def add_decoder(cls, decoder):
+        cls.decoders[decoder.name] = decoder
 
     def _get_id(self):
         """:return string"""
@@ -60,6 +62,13 @@ class Message(object):
     def encrypt(self):
         if self.encoder is not None:
             self.encoder.encrypt(self)
+
+    def decrypt(self):
+        if len(self.data['event']) > 8 and self.data['event'][0:8] == "message.":
+            if self.data['event'] in self.decoders:
+                self.decoders[self.data['event']].decrypt(self)
+            else:
+                raise DecryptNotFound("Decryptor %s not found".format(self.data['event']))
 
     def __bytes__(self):
         return json.dumps(self.data).encode()

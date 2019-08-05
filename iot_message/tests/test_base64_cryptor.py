@@ -18,8 +18,8 @@ class TestCryptorBase64(object):
     def test_encode_message(self):
         Message.chip_id = 'pc'
         Message.node_name = 'Turkusik'
+        Message.encoder = B64()
         msg = factory.MessageFactory.create()
-        msg.encoder = B64()
         inp = {"event": "channel.on", "parameters": {"channel": 0}, "response": "", "targets": ["node-north"]}
         msg.set(inp)
         msg.encrypt()
@@ -32,11 +32,11 @@ class TestCryptorBase64(object):
     def test_decrypt_message(self):
         Message.chip_id = 'pc'
         Message.node_name = 'Turkusik'
+        Message.add_decoder(B64())
         inp = """{"protocol": "iot:1", "node": "Turkusik", "chip_id": "pc", "event": "message.base64", "parameters": ["eyJwcm90b2NvbCI6ICJpb3Q6MSIsICJub2RlIjogIlR1cmt1c2lrIiwgImNoaXBfaWQiOiAicGMiLCAiZXZlbnQiOiAiY2hhbm5lbC5vbiIsICJwYXJhbWV0ZXJzIjogeyJjaGFubmVsIjogMH0sICJyZXNwb25zZSI6ICIiLCAidGFyZ2V0cyI6IFsiVHVya3VzaWsiXX0="], "response": "", "targets": ["Turkusik"]}"""
         msg = factory.MessageFactory.create(inp)
-
         assert_equal(msg.data["event"], "channel.on")
         assert_equal(msg.data["parameters"], {"channel": 0})
-        assert_equal(msg.data["target"], ['Turkusik'])
+        assert_equal(msg.data["targets"], ['Turkusik'])
 
 

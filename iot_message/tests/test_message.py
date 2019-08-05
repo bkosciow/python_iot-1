@@ -5,6 +5,7 @@
 from nose.tools import assert_equal
 from nose.tools import assert_not_equal
 from nose.tools import assert_is_instance
+import iot_message.factory as factory
 from nose.tools import assert_raises
 import iot_message.exception as ex
 import json
@@ -128,3 +129,9 @@ class TestMessage(object):
         }
 
         assert_equal(bytes(msg), json.dumps(data).encode())
+
+    def test_message_decoder_404(self):
+        message.Message.chip_id = 'pc'
+        message.Message.node_name = 'Turkusik'
+        inp = """{"protocol": "iot:1", "node": "Turkusik", "chip_id": "pc", "event": "message.notfound", "parameters": ["eyJwcm90b2NvbCI6ICJpb3Q6MSIsICJub2RlIjogIlR1cmt1c2lrIiwgImNoaXBfaWQiOiAicGMiLCAiZXZlbnQiOiAiY2hhbm5lbC5vbiIsICJwYXJhbWV0ZXJzIjogeyJjaGFubmVsIjogMH0sICJyZXNwb25zZSI6ICIiLCAidGFyZ2V0cyI6IFsiVHVya3VzaWsiXX0="], "response": "", "targets": ["Turkusik"]}"""
+        assert_raises(ex.DecryptNotFound, factory.MessageFactory.create, inp)

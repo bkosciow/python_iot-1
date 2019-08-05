@@ -21,6 +21,7 @@ class MessageFactory(object):
                 return None
             msg = Message()
             msg.set(message)
+            msg.decrypt()
             return msg
         except ValueError:
             raise ex.JsonException()
