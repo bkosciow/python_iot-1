@@ -1,11 +1,11 @@
 import socket
 from iot_message.message import Message
 
-address = ('192.168.1.255', 5053)
+address = ('192.168.43.255', 5053)
 
 message = Message()
 message.set({
-    'event': 'channel.off',
+    'event': 'channel.on',
     'parameters': {
         'channel': 0
     },
