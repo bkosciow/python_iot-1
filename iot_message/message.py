@@ -52,6 +52,9 @@ class Message(object):
             ]
         }
 
+    def clear(self):
+        self._initialize_data()
+
     def set(self, data):
         if self.data is None:
             self._initialize_data()

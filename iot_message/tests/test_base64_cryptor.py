@@ -39,4 +39,13 @@ class TestCryptorBase64(object):
         assert_equal(msg.data["parameters"], {"channel": 0})
         assert_equal(msg.data["targets"], ['Turkusik'])
 
+    def test_decrypt_message_without_parameters(self):
+        Message.chip_id = 'pc'
+        Message.node_name = 'Turkusik'
+        Message.add_decoder(B64())
+        inp = """{"chip_id":5665571,"protocol":"iot:1","node":"node-north","parameters":["eyJjaGlwX2lkIjo1NjY1NTcxLCJwcm90b2NvbCI6ImlvdDoxIiwibm9kZSI6Im5vZGUtbm9ydGgiLCJ0YXJnZXRzIjpbIkFMTCJdLCJldmVudCI6InBpci5tb3ZlbWVudCIsInJlc3BvbnNlIjoiIn0="],"targets":["ALL"],"event":"message.base64","response":""}"""
+        msg = factory.MessageFactory.create(inp)
+        assert_equal(msg.data["event"], "pir.movement")
+        assert_equal(msg.data["parameters"], {})
+        assert_equal(msg.data["targets"], ['ALL'])
 
