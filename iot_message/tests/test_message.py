@@ -130,8 +130,17 @@ class TestMessage(object):
 
         assert_equal(bytes(msg), json.dumps(data).encode())
 
-    def test_message_decoder_404(self):
+    def test_decoder_not_found(self):
         message.Message.chip_id = 'pc'
         message.Message.node_name = 'Turkusik'
-        inp = """{"protocol": "iot:1", "node": "Turkusik", "chip_id": "pc", "event": "message.notfound", "parameters": ["eyJwcm90b2NvbCI6ICJpb3Q6MSIsICJub2RlIjogIlR1cmt1c2lrIiwgImNoaXBfaWQiOiAicGMiLCAiZXZlbnQiOiAiY2hhbm5lbC5vbiIsICJwYXJhbWV0ZXJzIjogeyJjaGFubmVsIjogMH0sICJyZXNwb25zZSI6ICIiLCAidGFyZ2V0cyI6IFsiVHVya3VzaWsiXX0="], "response": "", "targets": ["Turkusik"]}"""
-        assert_raises(ex.DecryptNotFound, factory.MessageFactory.create, inp)
+        # inp = """{"protocol": "iot:1", "node": "Turkusik", "chip_id": "pc", "event": "message.notfound", "parameters": ["eyJwcm90b2NvbCI6ICJpb3Q6MSIsICJub2RlIjogIlR1cmt1c2lrIiwgImNoaXBfaWQiOiAicGMiLCAiZXZlbnQiOiAiY2hhbm5lbC5vbiIsICJwYXJhbWV0ZXJzIjogeyJjaGFubmVsIjogMH0sICJyZXNwb25zZSI6ICIiLCAidGFyZ2V0cyI6IFsiVHVya3VzaWsiXX0="], "response": "", "targets": ["Turkusik"]}"""
+        # assert_raises(ex.DecryptNotFound, factory.MessageFactory.create, inp)
+        inp = {
+            "event": "message.notfound",
+            "parameters": ["eyJwcm90b2NvbCI6ICJpb3Q6MSIsICJub2RlIjogIlR1cmt1c2lrIiwgImNoaXBfaWQiOiAicGMiLCAiZXZlbnQiOiAiY2hhbm5lbC5vbiIsICJwYXJhbWV0ZXJzIjogeyJjaGFubmVsIjogMH0sICJyZXNwb25zZSI6ICIiLCAidGFyZ2V0cyI6IFsiVHVya3VzaWsiXX0="],
+            "response": "",
+            "targets": ["Turkusik"]
+        }
+        msg = message.Message()
+        msg.set(inp)
+        assert_raises(ex.DecryptNotFound, msg.decrypt)

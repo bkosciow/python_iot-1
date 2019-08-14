@@ -20,6 +20,7 @@ try:
         try:
             data, address = s.recvfrom(65535)
             msg = factory.MessageFactory.create(data)
+            # if msg.data["node"] == "node-north":
             print(msg)
         except socket.timeout:
             pass

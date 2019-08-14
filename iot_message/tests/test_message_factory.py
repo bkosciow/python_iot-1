@@ -57,3 +57,9 @@ class TestMessageFactory(object):
         input = """{"protocol": "iot:1", "node": "node_name", "chip_id": "aaa", "event": "channel.on", "parameters": {"channel": 0}, "response": "", "targets": ["that"]}"""
         msg = factory.MessageFactory.create(input)
         assert_equal(msg, None)
+
+    def test_message_decoder_not_found(self):
+        message.Message.chip_id = 'pc'
+        message.Message.node_name = 'Turkusik'
+        inp = """{"protocol": "iot:1", "node": "Turkusik", "chip_id": "pc", "event": "message.notfound", "parameters": ["eyJwcm90b2NvbCI6ICJpb3Q6MSIsICJub2RlIjogIlR1cmt1c2lrIiwgImNoaXBfaWQiOiAicGMiLCAiZXZlbnQiOiAiY2hhbm5lbC5vbiIsICJwYXJhbWV0ZXJzIjogeyJjaGFubmVsIjogMH0sICJyZXNwb25zZSI6ICIiLCAidGFyZ2V0cyI6IFsiVHVya3VzaWsiXX0="], "response": "", "targets": ["Turkusik"]}"""
+        assert_raises(ex.DecryptNotFound, factory.MessageFactory.create, inp)
