@@ -6,3 +6,7 @@ class JsonException(Exception):
 
 class DecryptNotFound(Exception):
     pass
+
+
+class NoDecodersDefined(Exception):
+    pass

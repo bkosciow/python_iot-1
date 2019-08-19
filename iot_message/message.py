@@ -3,6 +3,7 @@ import os
 import subprocess
 import json
 from iot_message.exception import DecryptNotFound
+from iot_message.exception import NoDecodersDefined
 
 __author__ = 'Bartosz Kościów'
 
@@ -14,6 +15,7 @@ class Message(object):
     node_name = None
     encoder = None
     decoders = {}
+    drop_unencrypted = False
 
     def __init__(self):
         if self.chip_id is None:
@@ -52,6 +54,9 @@ class Message(object):
             ]
         }
 
+    def clear(self):
+        self._initialize_data()
+
     def set(self, data):
         if self.data is None:
             self._initialize_data()
@@ -69,6 +74,12 @@ class Message(object):
                 self.decoders[self.data['event']].decrypt(self)
             else:
                 raise DecryptNotFound("Decryptor %s not found".format(self.data['event']))
+        else:
+            if self.drop_unencrypted:
+                if len(self.decoders) > 0:
+                    self.data = None
+                else:
+                    raise NoDecodersDefined("Encryption required but decoders empty")
 
     def __bytes__(self):
         return json.dumps(self.data).encode()
