@@ -9,6 +9,7 @@ import iot_message.factory as factory
 from nose.tools import assert_raises
 import iot_message.exception as ex
 import json
+from iot_message.cryptor.base64 import Cryptor as B64
 
 __author__ = 'Bartosz Kościów'
 
@@ -17,11 +18,15 @@ import iot_message.message as message
 
 class TestMessage(object):
     def setUp(self):
-        message.Message.chip_id = 'miau'
+        message.Message.chip_id = 'pc'
+        message.Message.node_name = 'this'
+        message.Message.drop_unencrypted = False
+        message.Message.encoder = None
+        message.Message.decoders = {}
 
     def test_init_with_chip_id(self):
         msg = message.Message()
-        assert_equal(msg.chip_id, 'miau')
+        assert_equal(msg.chip_id, 'pc')
 
     def test_init_with_node_name(self):
         message.Message.node_name = 'miau_too'
@@ -105,36 +110,8 @@ class TestMessage(object):
 
         assert_equal(msg.data, data)
 
-    def test_encode_message(self):
-        msg = message.Message()
-        msg.set({
-            'event': 'event.test',
-            'parameters': {
-                'is_x': '1'
-            }
-        })
-
-        data = {
-            'protocol': msg.protocol,
-            'node': msg.node_name,
-            'chip_id': msg.chip_id,
-            'event': 'event.test',
-            'parameters': {
-                'is_x': '1'
-            },
-            'response': '',
-            'targets': [
-                'ALL'
-            ]
-        }
-
-        assert_equal(bytes(msg), json.dumps(data).encode())
-
     def test_decoder_not_found(self):
-        message.Message.chip_id = 'pc'
         message.Message.node_name = 'Turkusik'
-        # inp = """{"protocol": "iot:1", "node": "Turkusik", "chip_id": "pc", "event": "message.notfound", "parameters": ["eyJwcm90b2NvbCI6ICJpb3Q6MSIsICJub2RlIjogIlR1cmt1c2lrIiwgImNoaXBfaWQiOiAicGMiLCAiZXZlbnQiOiAiY2hhbm5lbC5vbiIsICJwYXJhbWV0ZXJzIjogeyJjaGFubmVsIjogMH0sICJyZXNwb25zZSI6ICIiLCAidGFyZ2V0cyI6IFsiVHVya3VzaWsiXX0="], "response": "", "targets": ["Turkusik"]}"""
-        # assert_raises(ex.DecryptNotFound, factory.MessageFactory.create, inp)
         inp = {
             "event": "message.notfound",
             "parameters": ["eyJwcm90b2NvbCI6ICJpb3Q6MSIsICJub2RlIjogIlR1cmt1c2lrIiwgImNoaXBfaWQiOiAicGMiLCAiZXZlbnQiOiAiY2hhbm5lbC5vbiIsICJwYXJhbWV0ZXJzIjogeyJjaGFubmVsIjogMH0sICJyZXNwb25zZSI6ICIiLCAidGFyZ2V0cyI6IFsiVHVya3VzaWsiXX0="],
@@ -144,3 +121,37 @@ class TestMessage(object):
         msg = message.Message()
         msg.set(inp)
         assert_raises(ex.DecryptNotFound, msg.decrypt)
+
+    def test_allow_plain_message(self):
+        inp = {"protocol": "iot:1", "node": "node_name", "chip_id": "aaa", "event": "channel.on", "parameters": {"channel": 0}, "response": "", "targets": ["this"]}
+        msg = message.Message()
+        msg.set(inp)
+        msg.decrypt()
+        data = {
+            'protocol': 'iot:1',
+            'node': 'node_name',
+            'chip_id': 'aaa',
+            'event': 'channel.on',
+            'parameters': {'channel': 0},
+            'response': '',
+            'targets': ['this']
+        }
+
+        assert_equal(bytes(msg), json.dumps(data).encode())
+
+    def test_drop_plain_message(self):
+        message.Message.drop_unencrypted = True
+        message.Message.add_decoder(B64())
+        inp = {"protocol": "iot:1", "node": "node_name", "chip_id": "aaa", "event": "channel.on", "parameters": {"channel": 0}, "response": "", "targets": ["this"]}
+        msg = message.Message()
+        msg.set(inp)
+        msg.decrypt()
+
+        assert_equal(msg.data, None)
+
+    def test_exception_when_decoders_empty_and_crypt_required(self):
+        message.Message.drop_unencrypted = True
+        inp = {"protocol": "iot:1", "node": "node_name", "chip_id": "aaa", "event": "channel.on", "parameters": {"channel": 0}, "response": "", "targets": ["this"]}
+        msg = message.Message()
+        msg.set(inp)
+        assert_raises(ex.NoDecodersDefined, msg.decrypt)
