@@ -23,24 +23,41 @@ Messages are json strings.
 - protocol: defines name, currently iot:1
 - node: friendly node name like light-room-big or screen-one-kitchen
 - chip_id: a unique device id
-- event: event name like light.on or dispay
+- event: event name like light.on or display
 - parameters: array of parameters. like rows to display
 - response: used when responding to request, ie returning toilet state
-- targets: message targets by nde name. special keyword ALL for all nodes in network
+- targets: message targets node with this names. special keyword ALL for all nodes in network
 
+## set node name or/and chip_id
+
+Message.chip_id = 'miau'
+Message.node_name = 'miau_too'
+
+### Message()
+
+Create new instance. It is autamatically filled with chip_id and node_name if not set 
+
+### Message(string_message)
+
+Creates message and fills with received data
+input = """{"protocol": "iot:1", "node": "node_name", "chip_id": "aaa", "event": "channel.on", "parameters": {"channel": 0}, "response": "", "targets": ["node-north"]}"""
+msg = factory.MessageFactory.create(input)
+        
 ## functions
 
-### Message(node, chip_id=None)
+### set(dictionary)
 
-Create instance of class. Node is a node name, chip_id if blank will be generated
+msg = message.Message()
+msg.set({
+    'event': 'event.test',
+    'parameters': {
+        'is_x': '1'
+    }
+})
 
-### prepare_message(data=None)
+Fills message with params.
 
-Returns empty message dictionary. If data is passed it copy values from it.
+### send message
 
-### decode_message(string)
-
-Decode json string to dict message. Validates protocol and targets.
- Return None on failure
-
+s.sendto(bytes(msg), address)
      
