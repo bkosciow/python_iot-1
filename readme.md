@@ -35,7 +35,7 @@ Message.node_name = 'miau_too'
 
 ### Message()
 
-Create new instance. It is autamatically filled with chip_id and node_name if not set 
+Create new instance. It is automatically filled with chip_id and node_name if not set 
 
 ### Message(string_message)
 
@@ -60,4 +60,13 @@ Fills message with params.
 ### send message
 
 s.sendto(bytes(msg), address)
+     
+## encders
+
+- base64
+
+Message.encoder = B64()
+
+Message.add_decoder(B64())
+
      
