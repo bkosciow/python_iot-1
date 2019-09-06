@@ -82,6 +82,7 @@ class Message(object):
                     raise NoDecodersDefined("Encryption required but decoders empty")
 
     def __bytes__(self):
+        self.encrypt()
         return json.dumps(self.data).encode()
 
     def __repr__(self):

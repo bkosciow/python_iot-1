@@ -6,6 +6,8 @@ Messages are json strings.
 
 ## Message body:
 
+.. code-block::
+
     {
         "protocol": "iot:1",
         "node": "Rpi-lcd-1",
@@ -19,6 +21,7 @@ Messages are json strings.
             "nodemcu-lcd-40x4"
         ]
     }
+
     
 - protocol: defines name, currently iot:1
 - node: friendly node name like light-room-big or screen-one-kitchen
@@ -30,8 +33,10 @@ Messages are json strings.
 
 ## set node name or/and chip_id
 
-Message.chip_id = 'miau'
-Message.node_name = 'miau_too'
+.. code-block::
+
+    Message.chip_id = 'miau'
+    Message.node_name = 'miau_too'
 
 ### Message()
 
@@ -40,24 +45,31 @@ Create new instance. It is autamatically filled with chip_id and node_name if no
 ### Message(string_message)
 
 Creates message and fills with received data
-input = """{"protocol": "iot:1", "node": "node_name", "chip_id": "aaa", "event": "channel.on", "parameters": {"channel": 0}, "response": "", "targets": ["node-north"]}"""
-msg = factory.MessageFactory.create(input)
+
+.. code-block::
+
+    input = """{"protocol": "iot:1", "node": "node_name", "chip_id": "aaa", "event": "channel.on", "parameters": {"channel": 0}, "response": "", "targets": ["node-north"]}"""
+    msg = factory.MessageFactory.create(input)
         
 ## functions
 
 ### set(dictionary)
 
-msg = message.Message()
-msg.set({
-    'event': 'event.test',
-    'parameters': {
-        'is_x': '1'
-    }
-})
+.. code-block::
+
+    msg = message.Message()
+    msg.set({
+        'event': 'event.test',
+        'parameters': {
+            'is_x': '1'
+        }
+    })
 
 Fills message with params.
 
 ### send message
 
-s.sendto(bytes(msg), address)
+.. code-block::
+
+    s.sendto(bytes(msg), address)
      
