@@ -13,7 +13,7 @@ class Message(object):
     protocol = "iot:1"
     chip_id = None
     node_name = None
-    encoder = None
+    encoders = []
     decoders = {}
     drop_unencrypted = False
 
@@ -25,10 +25,15 @@ class Message(object):
             self.node_name = self._get_node_name()
 
         self.data = None
+        self.encoder = 0
 
     @classmethod
     def add_decoder(cls, decoder):
         cls.decoders[decoder.name] = decoder
+
+    @classmethod
+    def add_encoder(cls, encoder):
+        cls.encoders.append(encoder)
 
     def _get_id(self):
         """:return string"""
@@ -65,8 +70,8 @@ class Message(object):
             self.data[k] = v
 
     def encrypt(self):
-        if self.encoder is not None:
-            self.encoder.encrypt(self)
+        if len(self.encoders) > 0:
+            self.encoders[self.encoder].encrypt(self)
 
     def decrypt(self):
         if len(self.data['event']) > 8 and self.data['event'][0:8] == "message.":

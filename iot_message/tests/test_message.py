@@ -10,6 +10,8 @@ from nose.tools import assert_raises
 import iot_message.exception as ex
 import json
 from iot_message.cryptor.base64 import Cryptor as B64
+from iot_message.cryptor.plain import Cryptor as Plain
+from unittest.mock import MagicMock
 
 __author__ = 'Bartosz Kościów'
 
@@ -21,7 +23,7 @@ class TestMessage(object):
         message.Message.chip_id = 'pc'
         message.Message.node_name = 'this'
         message.Message.drop_unencrypted = False
-        message.Message.encoder = None
+        message.Message.encoders = []
         message.Message.decoders = {}
 
     def test_init_with_chip_id(self):
@@ -155,3 +157,36 @@ class TestMessage(object):
         msg = message.Message()
         msg.set(inp)
         assert_raises(ex.NoDecodersDefined, msg.decrypt)
+
+    def test_add_encoder(self):
+        b = B64()
+        message.Message.add_encoder(b)
+        assert_equal(message.Message.encoders, [b])
+
+    def test_add_encoders(self):
+        b = B64()
+        p = Plain()
+        message.Message.add_encoder(b)
+        message.Message.add_encoder(p)
+        assert_equal(message.Message.encoders, [b, p])
+
+    def test_first_encoder_should_be_used(self):
+        m1 = MagicMock()
+        m2 = MagicMock()
+        message.Message.add_encoder(m1)
+        message.Message.add_encoder(m2)
+        msg = message.Message()
+        msg.encrypt()
+        m2.encrypt.assert_not_called()
+        m1.encrypt.assert_called_once()
+
+    def test_second_encoder_should_be_used(self):
+        m1 = MagicMock()
+        m2 = MagicMock()
+        message.Message.add_encoder(m1)
+        message.Message.add_encoder(m2)
+        msg = message.Message()
+        msg.encoder = 1
+        msg.encrypt()
+        m1.encrypt.assert_not_called()
+        m2.encrypt.assert_called_once()

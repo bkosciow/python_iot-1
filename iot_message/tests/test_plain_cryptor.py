@@ -13,10 +13,15 @@ import iot_message.factory as factory
 
 class TestCryptorPlain(object):
 
-    def test_encode_message(self):
+    def setUp(self):
         Message.chip_id = 'pc'
         Message.node_name = 'Turkusik'
-        Message.encoder = Cryptor()
+        Message.drop_unencrypted = False
+        Message.encoders = []
+        Message.decoders = {}
+
+    def test_encode_message(self):
+        Message.add_encoder(Cryptor())
         msg = factory.MessageFactory.create()
         inp = {"event": "channel.on", "parameters": {"channel": 0}, "response": "", "targets": ["node-north"]}
         msg.set(inp)
@@ -27,8 +32,6 @@ class TestCryptorPlain(object):
         assert_equal(inp["targets"], msg.data["targets"])
 
     def test_decrypt_message(self):
-        Message.chip_id = 'pc'
-        Message.node_name = 'Turkusik'
         Message.add_decoder(Cryptor())
         inp = """{"protocol": "iot:1", "node": "Turkusik", "chip_id": "pc", "event": "message.plain", "parameters": ["a"], "response": "", "targets": ["Turkusik"]}"""
         msg = factory.MessageFactory.create(inp)
