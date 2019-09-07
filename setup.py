@@ -13,7 +13,7 @@ def read(*paths):
 
 setup(
     name='iot_message',
-    version='1.0.1',
+    version='1.1.0',
     description='Custom iot:1 protocol',
     keywords=['iot:1'],
     long_description=(read('README.rst')),
