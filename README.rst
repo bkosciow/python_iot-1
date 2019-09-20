@@ -40,7 +40,7 @@ Messages are json strings.
 
 ### Message()
 
-Create new instance. It is autamatically filled with chip_id and node_name if not set 
+Create new instance. It is automatically filled with chip_id and node_name if not set
 
 ### Message(string_message)
 
@@ -72,4 +72,29 @@ Fills message with params.
 .. code-block::
 
     s.sendto(bytes(msg), address)
-     
+
+### AES encryptor
+
+
+Uses AES-CBC with hmac signing.
+require: pip install pycryptodome
+
+Cryptor takes four parameters:
+
+.. code-block::
+
+    def __init__(self, staticiv, ivkey, datakey, passphrase):
+        self.staticiv = staticiv
+        self.ivkey = ivkey
+        self.datakey = datakey
+        self.passphrase = passphrase
+
+Usage:
+
+.. code-block::
+
+    from iot_message.cryptor.aes_sha1 import Cryptor as AES
+
+    Message.add_decoder(AES(
+        'abcdef2345678901', '2345678901abcdef', '0123456789abcdef', 'mypassphrase'
+    ))
