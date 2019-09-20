@@ -1,5 +1,6 @@
 import socket
 from iot_message.cryptor.base64 import Cryptor as B64
+from iot_message.cryptor.aes_sha1 import Cryptor as AES
 from iot_message.message import Message
 import iot_message.factory as factory
 
@@ -14,7 +15,9 @@ s.bind((ip_address, port))
 Message.chip_id = 'pc'
 Message.node_name = 'Turkusik'
 Message.add_decoder(B64())
-
+Message.add_decoder(AES(
+    'abcdef2345678901', '2345678901abcdef', '0123456789abcdef', 'mypassphrase'
+))
 try:
     while True:
         try:
