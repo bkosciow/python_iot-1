@@ -73,6 +73,21 @@ Fills message with params.
 
     s.sendto(bytes(msg), address)
 
+### get value
+
+.. code-block::
+
+    msg = message.Message()
+    msg.set({
+        'event': 'event.test',
+        'parameters': {
+            'is_x': '1'
+        }
+    })
+
+    print(msg['event'])
+
+
 ### AES encryptor
 
 

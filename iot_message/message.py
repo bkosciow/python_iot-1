@@ -92,3 +92,6 @@ class Message(object):
 
     def __repr__(self):
         return json.dumps(self.data)
+
+    def __getitem__(self, item):
+        return self.data[item]
