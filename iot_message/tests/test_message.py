@@ -190,3 +190,10 @@ class TestMessage(object):
         msg.encrypt()
         m1.encrypt.assert_not_called()
         m2.encrypt.assert_called_once()
+
+    def test_access_data_as_array(self):
+        inp = {"protocol": "iot:1", "node": "node_name", "chip_id": "aaa", "event": "channel.on",
+               "parameters": {"channel": 0}, "response": "", "targets": ["this"]}
+        msg = message.Message()
+        msg.set(inp)
+        assert_equal(msg['node'], "node_name")
